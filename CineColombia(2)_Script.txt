@@ -1,0 +1,250 @@
+CREATE DATABASE CineColombia;
+
+USE CineColombia;
+
+CREATE TABLE Cliente (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    email VARCHAR(100),
+    telefono VARCHAR(20)
+);
+
+CREATE TABLE Cargo (
+    id_cargo INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    descripcion VARCHAR(255)
+);
+
+CREATE TABLE Sucursal (
+    id_sucursal INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    direccion VARCHAR(255),
+    telefono VARCHAR(20)
+);
+
+CREATE TABLE Empleado (
+    id_empleado INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    cargo_id INT,
+    sucursal_id INT,
+    FOREIGN KEY (cargo_id) REFERENCES Cargo(id_cargo),
+    FOREIGN KEY (sucursal_id) REFERENCES Sucursal(id_sucursal)
+);
+
+CREATE TABLE Contrato (
+    id_contrato INT AUTO_INCREMENT PRIMARY KEY,
+    empleado_id INT,
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    salario DECIMAL(10, 2),
+    FOREIGN KEY (empleado_id) REFERENCES Empleado(id_empleado)
+);
+
+CREATE TABLE Cinema (
+    id_cinema INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    direccion VARCHAR(255),
+    sucursal_id INT,
+    FOREIGN KEY (sucursal_id) REFERENCES Sucursal(id_sucursal)
+);
+
+CREATE TABLE Genero (
+    id_genero INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(100)
+);
+
+CREATE TABLE Director (
+    id_director INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100)
+);
+
+CREATE TABLE Pelicula (
+    id_pelicula INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(100),
+    genero_id INT,
+    director_id INT,
+    duracion INT,
+    FOREIGN KEY (genero_id) REFERENCES Genero(id_genero),
+    FOREIGN KEY (director_id) REFERENCES Director(id_director)
+);
+
+CREATE TABLE Tipo_Sala (
+    id_tipo_sala INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(100)
+);
+
+CREATE TABLE Sala (
+    id_sala INT AUTO_INCREMENT PRIMARY KEY,
+    numero INT,
+    cinema_id INT,
+    tipo_sala_id INT,
+    FOREIGN KEY (cinema_id) REFERENCES Cinema(id_cinema),
+    FOREIGN KEY (tipo_sala_id) REFERENCES Tipo_Sala(id_tipo_sala)
+);
+
+CREATE TABLE Silla (
+    id_silla INT AUTO_INCREMENT PRIMARY KEY,
+    numero INT,
+    sala_id INT,
+    FOREIGN KEY (sala_id) REFERENCES Sala(id_sala)
+);
+
+CREATE TABLE Horario (
+    id_horario INT AUTO_INCREMENT PRIMARY KEY,
+    hora_inicio TIME,
+    hora_fin TIME
+);
+
+CREATE TABLE Funcion (
+    id_funcion INT AUTO_INCREMENT PRIMARY KEY,
+    pelicula_id INT,
+    sala_id INT,
+    horario_id INT,
+    FOREIGN KEY (pelicula_id) REFERENCES Pelicula(id_pelicula),
+    FOREIGN KEY (sala_id) REFERENCES Sala(id_sala),
+    FOREIGN KEY (horario_id) REFERENCES Horario(id_horario)
+);
+
+CREATE TABLE Reserva (
+    id_reserva INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id INT,
+    funcion_id INT,
+    fecha DATE,
+    FOREIGN KEY (cliente_id) REFERENCES Cliente(id_cliente),
+    FOREIGN KEY (funcion_id) REFERENCES Funcion(id_funcion)
+);
+
+CREATE TABLE Tiquete (
+    id_tiquete INT AUTO_INCREMENT PRIMARY KEY,
+    reserva_id INT,
+    silla_id INT,
+    FOREIGN KEY (reserva_id) REFERENCES Reserva(id_reserva),
+    FOREIGN KEY (silla_id) REFERENCES Silla(id_silla)
+);
+
+CREATE TABLE Venta_Pelicula (
+    id_venta_pelicula INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id INT,
+    fecha DATE,
+    total DECIMAL(10, 2),
+    FOREIGN KEY (cliente_id) REFERENCES Cliente(id_cliente)
+);
+
+CREATE TABLE Detalle_Venta_Pelicula (
+    id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+    venta_pelicula_id INT,
+    tiquete_id INT,
+    cantidad INT,
+    subtotal DECIMAL(10, 2),
+    FOREIGN KEY (venta_pelicula_id) REFERENCES Venta_Pelicula(id_venta_pelicula),
+    FOREIGN KEY (tiquete_id) REFERENCES Tiquete(id_tiquete)
+);
+
+CREATE TABLE Tipo_Comestible (
+    id_tipo_comestible INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(100)
+);
+
+CREATE TABLE Comestible (
+    id_comestible INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    precio DECIMAL(10, 2),
+    tipo_comestible_id INT,
+    FOREIGN KEY (tipo_comestible_id) REFERENCES Tipo_Comestible(id_tipo_comestible)
+);
+
+CREATE TABLE Venta_Comestible (
+    id_venta_comestible INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id INT,
+    fecha DATE,
+    total DECIMAL(10, 2),
+    FOREIGN KEY (cliente_id) REFERENCES Cliente(id_cliente)
+);
+
+CREATE TABLE Detalle_Venta_Comestible (
+    id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+    venta_comestible_id INT,
+    comestible_id INT,
+    cantidad INT,
+    subtotal DECIMAL(10, 2),
+    FOREIGN KEY (venta_comestible_id) REFERENCES Venta_Comestible(id_venta_comestible),
+    FOREIGN KEY (comestible_id) REFERENCES Comestible(id_comestible)
+);
+
+CREATE TABLE Proveedor (
+    id_proveedor INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    telefono VARCHAR(20),
+    direccion VARCHAR(255)
+);
+
+CREATE TABLE Cinema_Proveedor (
+    id_cinema INT,
+    id_proveedor INT,
+    PRIMARY KEY (id_cinema, id_proveedor),
+    FOREIGN KEY (id_cinema) REFERENCES Cinema(id_cinema),
+    FOREIGN KEY (id_proveedor) REFERENCES Proveedor(id_proveedor)
+);
+
+CREATE TABLE Cafeteria (
+    id_cafeteria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    cinema_id INT,
+    FOREIGN KEY (cinema_id) REFERENCES Cinema(id_cinema)
+);
+
+CREATE TABLE Cafeteria_Comestible (
+    id_cafeteria INT,
+    id_comestible INT,
+    PRIMARY KEY (id_cafeteria, id_comestible),
+    FOREIGN KEY (id_cafeteria) REFERENCES Cafeteria(id_cafeteria),
+    FOREIGN KEY (id_comestible) REFERENCES Comestible(id_comestible)
+);
+
+CREATE TABLE Inventario_Comestible (
+    id_comestible INT,
+    cantidad INT,
+    ultima_actualizacion TIMESTAMP,
+    FOREIGN KEY (id_comestible) REFERENCES Comestible(id_comestible)
+);
+
+CREATE TABLE Tarifa (
+    id_tarifa INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    descripcion VARCHAR(255),
+    precio DECIMAL(10, 2),
+    tipo VARCHAR(50)
+);
+
+CREATE TABLE Funcion_Tarifa (
+    id_funcion INT,
+    id_tarifa INT,
+    PRIMARY KEY (id_funcion, id_tarifa),
+    FOREIGN KEY (id_funcion) REFERENCES Funcion(id_funcion),
+    FOREIGN KEY (id_tarifa) REFERENCES Tarifa(id_tarifa)
+);
+
+CREATE TABLE Usuario (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) NOT NULL,
+    contrasena VARCHAR(255) NOT NULL,
+    empleado_id INT,
+    FOREIGN KEY (empleado_id) REFERENCES Empleado(id_empleado)
+);
+
+CREATE TABLE Rol (
+    id_rol INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(100)
+);
+
+CREATE TABLE Usuario_Rol (
+    id_usuario INT,
+    id_rol INT,
+    PRIMARY KEY (id_usuario, id_rol),
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario),
+    FOREIGN KEY (id_rol) REFERENCES Rol(id_rol)
+);
+
